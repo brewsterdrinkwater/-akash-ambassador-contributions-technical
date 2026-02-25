@@ -30,7 +30,7 @@ services:
 
       # The URL below points to the source-search HTML file in this repo.
       # Update the branch name if you are working from a fork or feature branch.
-      - HTML_URL=https://raw.githubusercontent.com/brewsterdrinkwater/-akash-ambassador-contributions-technical/main/source-search/index.html
+      - HTML_URL=https://raw.githubusercontent.com/brewsterdrinkwater/-akash-ambassador-contributions-technical/claude/fix-search-api-404-V1jyx/source-search/index.html
 
     command:
       - sh
