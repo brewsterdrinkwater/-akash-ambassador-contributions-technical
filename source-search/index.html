@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Akash Source Search — Powered by AkashML</title>
+<style>
+  :root{
+    --red:#e83e3e;
+    --dark:#0d0d0d;
+    --card:#161616;
+    --border:#2a2a2a;
+    --text:#f0f0f0;
+    --muted:#888;
+    --green:#22c55e;
+    --blue:#3b82f6;
+    --primary-bg:rgba(34,197,94,.12);
+    --primary-border:rgba(34,197,94,.3);
+    --primary-text:#22c55e;
+    --secondary-bg:rgba(59,130,246,.12);
+    --secondary-border:rgba(59,130,246,.3);
+    --secondary-text:#60a5fa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--dark);color:var(--text);min-height:100vh;line-height:1.6;}
+  .container{max-width:1040px;margin:0 auto;padding:36px 24px 64px;}
+
+  /* ── Header ── */
+  .header{text-align:center;margin-bottom:40px;padding-bottom:32px;border-bottom:1px solid var(--border);}
+  .logo{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px;}
+  .logo-mark{width:48px;height:48px;background:var(--red);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;}
+  .logo-text{font-size:2rem;font-weight:800;}
+  .accent{color:var(--red);}
+  .header-sub{color:var(--muted);font-size:.95rem;margin-bottom:14px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(232,62,62,.1);border:1px solid rgba(232,62,62,.25);border-radius:20px;padding:5px 14px;font-size:.75rem;color:var(--red);font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+
+  /* ── API Key Panel ── */
+  .api-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:28px;transition:.3s;}
+  .api-panel.configured{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.04);}
+  .api-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .api-panel-title{font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:8px;}
+  .key-ok{color:var(--green);font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:4px;}
+  .api-row{display:flex;gap:10px;}
+  .api-input{flex:1;background:#111;border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-size:.88rem;font-family:'Courier New',monospace;outline:none;transition:.2s;}
+  .api-input:focus{border-color:var(--red);}
+  .api-input::placeholder{color:#555;font-family:'Segoe UI',system-ui,sans-serif;}
+  .btn{border:none;border-radius:8px;padding:11px 22px;font-size:.88rem;font-weight:700;cursor:pointer;transition:.2s;white-space:nowrap;}
+  .btn-red{background:var(--red);color:#fff;}
+  .btn-red:hover{background:#c93434;}
+  .btn-ghost{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border);}
+  .btn-ghost:hover{color:#ccc;background:rgba(255,255,255,.1);}
+  .api-hint{font-size:.79rem;color:var(--muted);margin-top:10px;}
+  .api-hint a{color:var(--red);text-decoration:none;}
+  .api-hint a:hover{text-decoration:underline;}
+  .key-masked{font-family:'Courier New',monospace;font-size:.85rem;color:#aaa;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;padding:4px 10px;}
+
+  /* ── Search ── */
+  .search-wrap{margin-bottom:32px;}
+  .search-row{display:flex;gap:10px;margin-bottom:12px;}
+  .search-input{flex:1;background:var(--card);border:2px solid var(--border);border-radius:12px;padding:16px 20px;color:var(--text);font-size:1rem;outline:none;transition:.2s;}
+  .search-input:focus{border-color:var(--red);}
+  .search-input::placeholder{color:#555;}
+  .search-btn{background:var(--red);color:#fff;border:none;border-radius:12px;padding:16px 30px;font-size:1rem;font-weight:800;cursor:pointer;transition:.2s;white-space:nowrap;}
+  .search-btn:hover:not(:disabled){background:#c93434;}
+  .search-btn:disabled{background:#2a2a2a;color:#555;cursor:not-allowed;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  .chips-label{font-size:.78rem;color:var(--muted);}
+  .chip{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:.78rem;color:#bbb;cursor:pointer;transition:.2s;}
+  .chip:hover{border-color:var(--red);color:var(--red);background:rgba(232,62,62,.06);}
+
+  /* ── Status ── */
+  .loading{text-align:center;padding:56px 24px;}
+  .spinner{display:inline-block;width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .75s linear infinite;margin-bottom:18px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-text{font-size:.95rem;color:#aaa;margin-bottom:6px;}
+  .loading-sub{font-size:.8rem;color:var(--muted);}
+  .error-box{background:rgba(232,62,62,.08);border:1px solid rgba(232,62,62,.3);border-radius:12px;padding:20px 24px;color:#f87171;font-size:.9rem;}
+  .error-box strong{display:block;margin-bottom:4px;font-size:.95rem;}
+
+  /* ── Results ── */
+  .results-bar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:12px;flex-wrap:wrap;}
+  .results-title{font-size:1.1rem;font-weight:800;}
+  .results-meta{font-size:.82rem;color:var(--muted);margin-top:3px;}
+  .copy-btn{background:rgba(255,255,255,.05);border:1px solid var(--border);color:#bbb;border-radius:8px;padding:8px 16px;font-size:.8rem;font-weight:600;cursor:pointer;transition:.2s;white-space:nowrap;}
+  .copy-btn:hover{border-color:var(--red);color:var(--red);}
+
+  .disclaimer{background:rgba(255,193,7,.06);border:1px solid rgba(255,193,7,.18);border-radius:8px;padding:11px 16px;font-size:.78rem;color:#d4a017;margin-bottom:24px;}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  @media(max-width:680px){.cols{grid-template-columns:1fr;}}
+
+  .col-label{font-size:.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+  .col-label.p{color:var(--primary-text);}
+  .col-label.s{color:var(--secondary-text);}
+  .col-dot{width:8px;height:8px;border-radius:50%;}
+  .col-dot.p{background:var(--primary-text);}
+  .col-dot.s{background:var(--secondary-text);}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:14px;transition:.2s;position:relative;overflow:hidden;}
+  .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+  .card.p::before{background:var(--primary-text);}
+  .card.s::before{background:var(--secondary-text);}
+  .card:hover{border-color:#383838;transform:translateY(-1px);}
+
+  .card-badge{display:inline-block;font-size:.62rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;border-radius:4px;padding:2px 8px;margin-bottom:8px;}
+  .card-badge.p{background:var(--primary-bg);color:var(--primary-text);border:1px solid var(--primary-border);}
+  .card-badge.s{background:var(--secondary-bg);color:var(--secondary-text);border:1px solid var(--secondary-border);}
+
+  .card-cat{font-size:.72rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;}
+  .card-title{font-weight:700;font-size:.9rem;line-height:1.35;margin-bottom:6px;}
+  .card-authors{font-size:.8rem;color:#bbb;margin-bottom:3px;}
+  .card-pub{font-size:.77rem;color:var(--muted);margin-bottom:10px;}
+  .card-desc{font-size:.82rem;color:#ccc;line-height:1.55;margin-bottom:10px;}
+  .card-link a{font-size:.77rem;color:var(--red);text-decoration:none;word-break:break-all;}
+  .card-link a:hover{text-decoration:underline;}
+
+  /* ── Footer ── */
+  .footer{text-align:center;margin-top:56px;padding-top:24px;border-top:1px solid var(--border);color:var(--muted);font-size:.78rem;}
+  .footer a{color:var(--red);text-decoration:none;}
+  .footer a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-mark">📚</div>
+      <div class="logo-text">Akash <span class="accent">Source Search</span></div>
+    </div>
+    <p class="header-sub">AI-powered academic source discovery for student researchers</p>
+    <span class="badge">⚡ Powered by AkashML · DeepSeek V3</span>
+  </div>
+
+  <!-- API Key Panel -->
+  <!-- This panel is hidden automatically when AKASHML_API_KEY is set in deploy.yaml -->
+  <div class="api-panel" id="apiPanel">
+    <div class="api-panel-head">
+      <div class="api-panel-title">🔑 AkashML API Key</div>
+      <div class="key-ok" id="keyOk" style="display:none;">✓ Key configured</div>
+    </div>
+
+    <div id="apiInputSection">
+      <div class="api-row">
+        <input class="api-input" type="password" id="apiKeyInput" placeholder="Paste your AkashML API key here…" autocomplete="off"/>
+        <button class="btn btn-red" onclick="saveKey()">Save Key</button>
+        <button class="btn btn-ghost" onclick="clearKey()">Clear</button>
+      </div>
+      <div class="api-hint">
+        No key yet? <a href="https://akashml.com" target="_blank">Sign up at akashml.com</a> and get <strong style="color:#f0f0f0;">$100 in free credits</strong> — takes under 2 minutes.
+      </div>
+    </div>
+
+    <div id="apiSavedSection" style="display:none;">
+      <span class="key-masked" id="keyMasked"></span>
+      <div class="api-hint" style="margin-top:8px;">
+        Key saved in your browser. <a href="#" onclick="clearKey();return false;">Remove key</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <div class="search-row">
+      <input class="search-input" type="text" id="searchInput"
+        placeholder="Enter a research topic (e.g. 'blockchain consensus mechanisms', 'climate migration policy')…"
+        onkeydown="if(event.key==='Enter')doSearch()"/>
+      <button class="search-btn" id="searchBtn" onclick="doSearch()">Find Sources</button>
+    </div>
+    <div class="chips">
+      <span class="chips-label">Try:</span>
+      <span class="chip" onclick="setQ('decentralized cloud computing')">Decentralized Cloud</span>
+      <span class="chip" onclick="setQ('AI ethics and algorithmic bias')">AI Ethics</span>
+      <span class="chip" onclick="setQ('renewable energy storage systems')">Energy Storage</span>
+      <span class="chip" onclick="setQ('distributed ledger technology')">Distributed Ledger</span>
+      <span class="chip" onclick="setQ('CRISPR gene editing ethics')">CRISPR Ethics</span>
+    </div>
+  </div>
+
+  <!-- Dynamic Output -->
+  <div id="output"></div>
+
+  <!-- Footer -->
+  <div class="footer">
+    Built for Akash Student Ambassadors &nbsp;·&nbsp;
+    <a href="https://akashml.com" target="_blank">AkashML</a> &nbsp;·&nbsp;
+    <a href="https://console.akash.network" target="_blank">Akash Console</a> &nbsp;·&nbsp;
+    <a href="https://github.com/akash-network" target="_blank">GitHub</a>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+/* ─────────────────────────────────────────────────────────────────────────
+   API KEY
+   The INJECTED_KEY placeholder below is replaced at container startup by
+   the deploy.yaml startup script. If it remains unchanged, the user must
+   enter their key manually in the panel above.
+───────────────────────────────────────────────────────────────────────── */
+const INJECTED_KEY = '__AKASHML_API_KEY__';
+const API_BASE     = 'https://api.akashml.com/api/v1';
+const MODEL        = 'deepseek-ai/DeepSeek-V3';
+
+let apiKey = '';
+
+function init() {
+  // Key injected at deploy time via SDL env var?
+  if (INJECTED_KEY && INJECTED_KEY !== '__AKASHML_API_KEY__') {
+    apiKey = INJECTED_KEY;
+    document.getElementById('apiPanel').style.display = 'none';
+    return;
+  }
+  // Key previously saved in browser storage?
+  const saved = localStorage.getItem('akashml_api_key');
+  if (saved) {
+    apiKey = saved;
+    showKeySet(saved);
+  }
+}
+
+function saveKey() {
+  const val = (document.getElementById('apiKeyInput').value || '').trim();
+  if (!val) return;
+  apiKey = val;
+  localStorage.setItem('akashml_api_key', val);
+  showKeySet(val);
+}
+
+function clearKey() {
+  apiKey = '';
+  localStorage.removeItem('akashml_api_key');
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('keyOk').style.display         = 'none';
+  document.getElementById('apiInputSection').style.display = '';
+  document.getElementById('apiSavedSection').style.display = 'none';
+  document.getElementById('apiPanel').classList.remove('configured');
+}
+
+function showKeySet(key) {
+  const masked = key.slice(0, 8) + '••••••••' + key.slice(-4);
+  document.getElementById('keyMasked').textContent = masked;
+  document.getElementById('keyOk').textContent              = '✓ Key configured';
+  document.getElementById('keyOk').style.display            = 'block';
+  document.getElementById('apiInputSection').style.display  = 'none';
+  document.getElementById('apiSavedSection').style.display  = '';
+  document.getElementById('apiPanel').classList.add('configured');
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SEARCH
+───────────────────────────────────────────────────────────────────────── */
+function setQ(text) {
+  document.getElementById('searchInput').value = text;
+  document.getElementById('searchInput').focus();
+}
+
+async function doSearch() {
+  const query = (document.getElementById('searchInput').value || '').trim();
+  if (!query) { showError('Please enter a research topic.'); return; }
+  if (!apiKey) { showError('Please enter your AkashML API key above to get started.'); return; }
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled    = true;
+  btn.textContent = 'Searching…';
+  showLoading(query);
+
+  try {
+    const sources = await fetchSources(query);
+    renderResults(query, sources);
+  } catch (err) {
+    showError(err.message || 'Something went wrong. Please check your API key and try again.');
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Find Sources';
+  }
+}
+
+async function fetchSources(query) {
+  const systemPrompt =
+    'You are an expert academic research librarian. ' +
+    'You return ONLY valid JSON arrays when asked for sources. ' +
+    'No markdown, no explanation, no extra text.';
+
+  const userPrompt =
+    `Find 10 academic sources about the topic: "${query}"\n\n` +
+    'Return a JSON array of exactly 10 source objects.\n' +
+    '- Items 1–5 must have "type": "primary"  (original research papers, datasets, ' +
+    'government reports, primary documents, firsthand empirical studies)\n' +
+    '- Items 6–10 must have "type": "secondary" (textbooks, review articles, ' +
+    'meta-analyses, encyclopedias, edited collections)\n\n' +
+    'Each object must contain these exact fields:\n' +
+    '{\n' +
+    '  "title": "Full title of the work",\n' +
+    '  "authors": "Last, F. M., Last, F. M.",\n' +
+    '  "year": 2023,\n' +
+    '  "type": "primary",\n' +
+    '  "category": "Journal Article",\n' +
+    '  "description": "2–3 sentences explaining what this source covers and why it is relevant.",\n' +
+    '  "publisher": "Journal name or Publisher",\n' +
+    '  "identifier": "DOI, ISBN, or URL — empty string if unknown"\n' +
+    '}\n\n' +
+    'Use real, verifiable academic sources where possible. ' +
+    'Return ONLY the JSON array with no other text.';
+
+  const response = await fetch(`${API_BASE}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user',   content: userPrompt   }
+      ],
+      temperature: 0.2,
+      max_tokens:  4096
+    })
+  });
+
+  if (!response.ok) {
+    let errMsg = `API error ${response.status}`;
+    try {
+      const errBody = await response.json();
+      errMsg = errBody.error?.message || errMsg;
+    } catch(_){}
+    throw new Error(errMsg);
+  }
+
+  const data    = await response.json();
+  let   content = (data.choices?.[0]?.message?.content || '').trim();
+
+  // Strip DeepSeek reasoning tags if present
+  content = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+
+  // Strip markdown code fences if present
+  content = content
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/, '')
+    .trim();
+
+  // Parse JSON
+  let sources;
+  try {
+    sources = JSON.parse(content);
+  } catch (_) {
+    const match = content.match(/\[[\s\S]*\]/);
+    if (match) {
+      sources = JSON.parse(match[0]);
+    } else {
+      throw new Error('Could not parse sources from the AI response. Try again or rephrase your topic.');
+    }
+  }
+
+  if (!Array.isArray(sources) || sources.length === 0) {
+    throw new Error('No sources returned. Please try a different topic.');
+  }
+
+  return sources;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   RENDERING
+───────────────────────────────────────────────────────────────────────── */
+function showLoading(query) {
+  document.getElementById('output').innerHTML = `
+    <div class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Finding sources for <strong>"${esc(query)}"</strong>…</div>
+      <div class="loading-sub">DeepSeek is locating primary and secondary sources</div>
+    </div>`;
+}
+
+function showError(msg) {
+  document.getElementById('output').innerHTML =
+    `<div class="error-box"><strong>Error</strong>${esc(msg)}</div>`;
+}
+
+function renderResults(query, sources) {
+  // Split by type label; fall back to positional split if model didn't label
+  let primary   = sources.filter(s => s.type === 'primary');
+  let secondary = sources.filter(s => s.type === 'secondary' || s.type !== 'primary');
+
+  if (primary.length === 0 && secondary.length === 0) {
+    primary   = sources.slice(0, 5);
+    secondary = sources.slice(5);
+    primary.forEach(s   => { s.type = 'primary';   });
+    secondary.forEach(s => { s.type = 'secondary'; });
+  }
+
+  // Cap at 5 each
+  primary   = primary.slice(0, 5);
+  secondary = secondary.slice(0, 5);
+
+  const all = [...primary, ...secondary];
+
+  document.getElementById('output').innerHTML = `
+    <div class="results-bar">
+      <div>
+        <div class="results-title">Sources for: <span style="color:var(--red)">"${esc(query)}"</span></div>
+        <div class="results-meta">${primary.length} primary · ${secondary.length} secondary</div>
+      </div>
+      <button class="copy-btn" onclick="copyCitations(${esc2(JSON.stringify(all))})">📋 Copy Citations</button>
+    </div>
+    <div class="disclaimer">
+      ⚠️ <strong>Verify before citing:</strong> AI-generated sources may be inaccurate or hallucinated.
+      Always confirm each source exists using Google Scholar, JSTOR, or your university library
+      before including it in academic work.
+    </div>
+    <div class="cols">
+      <div>
+        <div class="col-label p"><span class="col-dot p"></span>Primary Sources (${primary.length})</div>
+        ${primary.map(s => cardHTML(s, 'p')).join('')}
+        ${primary.length === 0 ? '<p style="color:var(--muted);font-size:.85rem">No primary sources returned.</p>' : ''}
+      </div>
+      <div>
+        <div class="col-label s"><span class="col-dot s"></span>Secondary Sources (${secondary.length})</div>
+        ${secondary.map(s => cardHTML(s, 's')).join('')}
+        ${secondary.length === 0 ? '<p style="color:var(--muted);font-size:.85rem">No secondary sources returned.</p>' : ''}
+      </div>
+    </div>`;
+}
+
+function cardHTML(src, cls) {
+  const label    = cls === 'p' ? 'Primary' : 'Secondary';
+  const year     = src.year    ? String(src.year) : 'n.d.';
+  const pub      = src.publisher ? ` · ${esc(src.publisher)}` : '';
+  const linkHTML = buildLink(src.identifier);
+  return `
+    <div class="card ${cls}">
+      <div><span class="card-badge ${cls}">${label}</span></div>
+      <div class="card-cat">${esc(src.category || 'Academic Source')}</div>
+      <div class="card-title">${esc(src.title || 'Untitled')}</div>
+      <div class="card-authors">${esc(src.authors || 'Unknown authors')}</div>
+      <div class="card-pub">${year}${pub}</div>
+      <div class="card-desc">${esc(src.description || '')}</div>
+      ${linkHTML}
+    </div>`;
+}
+
+function buildLink(id) {
+  if (!id || !id.trim()) return '';
+  const clean = id.trim();
+  const href  = clean.startsWith('http') ? clean : `https://doi.org/${clean}`;
+  const label = clean.length > 55 ? clean.slice(0, 52) + '…' : clean;
+  return `<div class="card-link"><a href="${esc(href)}" target="_blank" rel="noopener noreferrer">🔗 ${esc(label)}</a></div>`;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   UTILITIES
+───────────────────────────────────────────────────────────────────────── */
+function esc(str) {
+  if (typeof str !== 'string') str = String(str || '');
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Escape for use inside an HTML attribute string that is already inside double-quotes
+function esc2(str) {
+  return esc(str).replace(/'/g, '&#39;');
+}
+
+function copyCitations(sourcesJson) {
+  try {
+    const sources = JSON.parse(sourcesJson);
+    const lines = sources.map((s, i) => {
+      const t = s.type === 'primary' ? '[PRIMARY]' : '[SECONDARY]';
+      const id = s.identifier ? ` ${s.identifier}` : '';
+      return `${i + 1}. ${t} ${s.authors || 'Unknown'} (${s.year || 'n.d.'}). ${s.title || 'Untitled'}. ${s.publisher || ''}${id}`.replace(/\s+/g, ' ').trim();
+    });
+    navigator.clipboard.writeText(lines.join('\n')).then(
+      ()  => alert('Citations copied to clipboard!'),
+      ()  => alert('Copy failed — please select and copy manually.')
+    );
+  } catch(_) {
+    alert('Could not copy citations.');
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   BOOT
+───────────────────────────────────────────────────────────────────────── */
+init();
+</script>
+</body>
+</html>
