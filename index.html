@@ -1,13 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Akash Student Ambassador - Technical Contributions</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Akash Technical Contributions</title>
+<style>
+  :root{--red:#e83e3e;--dark:#0d0d0d;--card:#161616;--border:#2a2a2a;--text:#f0f0f0;--muted:#888;--accent:#e83e3e;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--dark);color:var(--text);height:100vh;overflow:hidden;}
+  .deck{width:100%;height:100vh;position:relative;}
+  .slide{display:none;width:100%;height:100vh;padding:48px 64px;flex-direction:column;justify-content:center;position:absolute;top:0;left:0;animation:fadeIn .3s ease;}
+  .slide.active{display:flex;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .nav{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:center;z-index:100;background:rgba(22,22,22,.9);border:1px solid var(--border);border-radius:50px;padding:10px 20px;}
+  .nav button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:4px 12px;border-radius:20px;transition:.2s;}
+  .nav button:hover,.nav button.active{background:var(--red);color:#fff;}
+  .slide-counter{color:var(--muted);font-size:12px;min-width:50px;text-align:center;}
+  .tag{display:inline-block;background:rgba(232,62,62,.15);color:var(--red);border:1px solid rgba(232,62,62,.3);border-radius:4px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;margin-bottom:16px;}
+  h1{font-size:clamp(2rem,5vw,3.8rem);font-weight:800;line-height:1.1;margin-bottom:16px;}
+  h2{font-size:clamp(1.4rem,3vw,2.2rem);font-weight:700;margin-bottom:8px;}
+  h3{font-size:1.1rem;font-weight:600;margin-bottom:6px;}
+  p,li{color:#ccc;line-height:1.6;font-size:clamp(.85rem,1.5vw,1rem);}
+  .accent{color:var(--red);}
+  .grid{display:grid;gap:16px;margin-top:24px;}
+  .grid-2{grid-template-columns:repeat(2,1fr);}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:.2s;}
+  .card:hover{border-color:var(--red);transform:translateY(-2px);}
+  .card-icon{font-size:2rem;margin-bottom:10px;}
+  .card a{color:var(--red);font-size:.8rem;word-break:break-all;text-decoration:none;}
+  .card a:hover{text-decoration:underline;}
+  .timeline{margin-top:24px;}
+  .titem{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;}
+  .ttime{min-width:90px;background:rgba(232,62,62,.1);border:1px solid rgba(232,62,62,.3);color:var(--red);font-size:.75rem;font-weight:700;text-align:center;padding:4px 8px;border-radius:6px;}
+  .tcontent{flex:1;}
+  .tphasebadge{font-size:.7rem;background:var(--card);border:1px solid var(--border);border-radius:4px;padding:2px 8px;color:var(--muted);margin-left:8px;}
+  .steps{counter-reset:step;margin-top:20px;}
+  .step{display:flex;gap:16px;margin-bottom:16px;align-items:flex-start;}
+  .step-num{min-width:32px;height:32px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;}
+  .hero-sub{font-size:1.15rem;color:var(--muted);max-width:600px;margin-bottom:32px;}
+  .hero-stats{display:flex;gap:32px;margin-top:32px;}
+  .stat-val{font-size:2rem;font-weight:800;color:var(--red);}
+  .stat-lbl{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+  .repo{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:10px;}
+  .repo-icon{font-size:1.4rem;}
+  .repo-name{font-weight:700;font-size:.95rem;}
+  .repo-desc{font-size:.8rem;color:var(--muted);}
+  .repo a{margin-left:auto;color:var(--red);font-size:.8rem;white-space:nowrap;text-decoration:none;}
+  .deploy-step{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;}
+  .deploy-num{min-width:28px;height:28px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;flex-shrink:0;}
+  .divider{width:60px;height:3px;background:var(--red);border-radius:2px;margin:12px 0 20px;}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .pill{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:20px;padding:4px 14px;font-size:.8rem;color:#ccc;}
+  .scroll-area{overflow-y:auto;max-height:calc(100vh - 200px);padding-right:8px;}
+  .scroll-area::-webkit-scrollbar{width:4px;}
+  .scroll-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .link-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+  .link-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(232,62,62,.1);border:1px solid rgba(232,62,62,.3);color:var(--red);border-radius:8px;padding:8px 14px;font-size:.8rem;font-weight:600;text-decoration:none;transition:.2s;}
+  .link-btn:hover{background:var(--red);color:#fff;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:32px;}
+</style>
 </head>
 <body>
-  <!-- Replace this file with the contents of studentambassadorstechnicalcontributions.html -->
-  <h1>Akash Student Ambassador Technical Contributions</h1>
-  <p>This is a placeholder. Replace this file with your actual HTML content.</p>
+<div class="deck">
+<div class="slide active" id="s1">
+  <div class="tag">Akash Student Ambassadors · Technical Track</div>
+  <h1>Contributing to<br/><span class="accent">Akash Network</span></h1>
+  <p class="hero-sub">A working session on open-source contributions, issue tracking, and hands-on deployment with Akash Console &amp; AkashML.</p>
+  <div class="hero-stats">
+    <div><div class="stat-val">3.1M+</div><div class="stat-lbl">Deployments in 2025</div></div>
+    <div><div class="stat-val">80+</div><div class="stat-lbl">Global Datacenters</div></div>
+    <div><div class="stat-val">85%</div><div class="stat-lbl">Cost Savings vs AWS</div></div>
+    <div><div class="stat-val">Open</div><div class="stat-lbl">Source &amp; Community-Led</div></div>
+  </div>
+</div>
+<div class="slide" id="s2">
+  <div class="tag">Today's Session · 90 Minutes</div>
+  <h2>Agenda</h2>
+  <div class="divider"></div>
+  <div class="timeline">
+    <div class="titem"><div class="ttime">0:00 – 0:05</div><div class="tcontent"><h3>Welcome &amp; Intro <span class="tphasebadge">Orientation</span></h3><p>Why technical contributions matter for the Akash ecosystem</p></div></div>
+    <div class="titem"><div class="ttime">0:05 – 0:15</div><div class="tcontent"><h3>The Akash GitHub Ecosystem <span class="tphasebadge">Part 1</span></h3><p>Org overview, key repos, discussions, and project boards — <a href="https://github.com/akash-network" target="_blank" style="color:var(--red);">github.com/akash-network</a></p></div></div>
+    <div class="titem"><div class="ttime">0:15 – 0:30</div><div class="tcontent"><h3>Contributing to Website, Docs &amp; Awesome Akash <span class="tphasebadge">Part 2</span></h3><p>How to submit PRs, write docs, add templates &amp; blog posts</p></div></div>
+    <div class="titem"><div class="ttime">0:30 – 0:45</div><div class="tcontent"><h3>Support &amp; Console Repos — Tracking Issues <span class="tphasebadge">Part 3</span></h3><p>How to find, label, triage, and fix issues</p></div></div>
+    <div class="titem"><div class="ttime">0:45 – 1:30</div><div class="tcontent"><h3>🛠 Hands-On: Deploy an AI Model <span class="tphasebadge">Interactive</span></h3><p>Deploy on Akash Console + AkashML Playground — live, together</p></div></div>
+  </div>
+</div>
+<div class="slide" id="s3">
+  <div class="tag">Part 1 · GitHub</div>
+  <h2>The Akash GitHub Organization</h2>
+  <div class="divider"></div>
+  <div class="scroll-area">
+    <div class="repo"><div class="repo-icon">🌐</div><div><div class="repo-name">akash-network / website</div><div class="repo-desc">Official Akash Network website &amp; documentation</div></div><a href="https://github.com/akash-network/website" target="_blank">github.com/akash-network/website →</a></div>
+    <div class="repo"><div class="repo-icon">🖥️</div><div><div class="repo-name">akash-network / console</div><div class="repo-desc">Deploy docker containers on Akash — Next.js monorepo</div></div><a href="https://github.com/akash-network/console" target="_blank">github.com/akash-network/console →</a></div>
+    <div class="repo"><div class="repo-icon">⭐</div><div><div class="repo-name">akash-network / awesome-akash</div><div class="repo-desc">Community deployment templates &amp; SDL examples</div></div><a href="https://github.com/akash-network/awesome-akash" target="_blank">github.com/akash-network/awesome-akash →</a></div>
+    <div class="repo"><div class="repo-icon">🛠️</div><div><div class="repo-name">akash-network / support</div><div class="repo-desc">Central issue tracker for all Akash repos</div></div><a href="https://github.com/akash-network/support" target="_blank">github.com/akash-network/support →</a></div>
+    <div class="repo"><div class="repo-icon">💬</div><div><div class="repo-name">akash-network · Discussions</div><div class="repo-desc">Governance proposals, feature ideas, community RFCs</div></div><a href="https://github.com/orgs/akash-network/discussions" target="_blank">github.com/orgs/akash-network/discussions →</a></div>
+    <div class="repo"><div class="repo-icon">📋</div><div><div class="repo-name">akash-network · Project Board</div><div class="repo-desc">Track active initiatives, bounties &amp; WG/SIG work</div></div><a href="https://github.com/orgs/akash-network/projects" target="_blank">github.com/orgs/akash-network/projects →</a></div>
+  </div>
+</div>
+<div class="slide" id="s4">
+  <div class="tag">Part 1 · GitHub Features</div>
+  <h2>Discussions &amp; Project Board</h2>
+  <div class="divider"></div>
+  <div class="two-col" style="margin-top:20px;">
+    <div>
+      <h3>💬 GitHub Discussions</h3>
+      <p style="margin-bottom:12px;">Where the community proposes ideas, governance changes, and collaborates before code is written.</p>
+      <div class="card"><div class="card-icon">🗳️</div><h3>Use it for:</h3><ul style="margin-top:8px;padding-left:18px;"><li>Proposing new features or templates</li><li>Sharing deployment ideas</li><li>Governance &amp; funding proposals</li><li>Asking the community before filing issues</li></ul><div style="margin-top:12px;"><a href="https://github.com/orgs/akash-network/discussions" target="_blank">→ Open Discussions</a></div></div>
+    </div>
+    <div>
+      <h3>📋 Project Board</h3>
+      <p style="margin-bottom:12px;">Tracks all active work across SIGs, WGs, and bounties in one place.</p>
+      <div class="card"><div class="card-icon">🏷️</div><h3>What you'll find:</h3><ul style="margin-top:8px;padding-left:18px;"><li>Bounty-labeled issues with $$ rewards</li><li>Active WG (Working Group) tasks</li><li>Issues tagged by priority (P0–P3)</li><li>Good first issues for new contributors</li></ul><div style="margin-top:12px;"><a href="https://akash.network/development/current-projects/" target="_blank">→ Current Projects</a></div></div>
+    </div>
+  </div>
+  <div style="margin-top:16px;background:rgba(232,62,62,.08);border:1px solid rgba(232,62,62,.2);border-radius:8px;padding:12px 16px;"><strong>💡 Pro tip:</strong> <span style="color:#ccc;">Always search existing discussions and issues before opening a new one. Ask in Discord first!</span><a href="https://discord.akash.network" target="_blank" style="color:var(--red);margin-left:10px;font-size:.85rem;">discord.akash.network →</a></div>
+</div>
+<div class="slide" id="s5">
+  <div class="tag">Part 2 · Contributing</div>
+  <h2>Contributing to the Website &amp; Docs</h2>
+  <div class="divider"></div>
+  <div class="scroll-area">
+    <div class="grid grid-3" style="margin-top:4px;">
+      <div class="card"><div class="card-icon">✍️</div><h3>Write a Blog Post</h3><p>Create <code style="color:var(--red);font-size:.8rem;">src/content/Blog/your-post/index.md</code> and submit a PR. Markdown format.</p></div>
+      <div class="card"><div class="card-icon">🎉</div><h3>Add a Community Event</h3><p>Add to <code style="color:var(--red);font-size:.8rem;">src/content/Community_Akash_Events_Page/</code> with banner image + index.md</p></div>
+      <div class="card"><div class="card-icon">🌍</div><h3>Add an Ecosystem Project</h3><p>Add to <code style="color:var(--red);font-size:.8rem;">src/content/Ecosystem_Page/</code> — categories: deployed_on_akash or akash-tools</p></div>
+      <div class="card"><div class="card-icon">🏆</div><h3>Community Contributions</h3><p>Showcase your project at <code style="color:var(--red);font-size:.8rem;">Community_Contributions_Page/</code> with a banner</p></div>
+      <div class="card"><div class="card-icon">🐛</div><h3>Fix Docs Issues</h3><p>Docs are part of the website repo. Find open issues labeled <code style="color:var(--red);font-size:.8rem;">docs</code> and submit fixes</p></div>
+      <div class="card"><div class="card-icon">🔧</div><h3>Code Contributions</h3><p>Follow commit conventions: <code style="color:var(--red);font-size:.8rem;">feat:</code> <code style="color:var(--red);font-size:.8rem;">fix:</code> <code style="color:var(--red);font-size:.8rem;">docs:</code> prefixes. Use kebab-case filenames.</p></div>
+    </div>
+    <div class="link-row" style="margin-top:20px;">
+      <a class="link-btn" href="https://github.com/akash-network/website" target="_blank">📁 Website Repo</a>
+      <a class="link-btn" href="https://akash.network/docs" target="_blank">📖 Live Docs</a>
+      <a class="link-btn" href="https://github.com/akash-network/website/blob/main/CONTRIBUTING.md" target="_blank">📋 Contributing Guide</a>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s6">
+  <div class="tag">Part 2 · Awesome Akash</div>
+  <h2>⭐ Awesome Akash — Add Your Template</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:20px;">A curated list of deployment examples anyone can use. Adding a template is one of the easiest and highest-impact contributions you can make.</p>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div><h3>Fork the repo</h3><p><a href="https://github.com/akash-network/awesome-akash" target="_blank" style="color:var(--red);">github.com/akash-network/awesome-akash</a> — click Fork</p></div></div>
+    <div class="step"><div class="step-num">2</div><div><h3>Create your folder</h3><p>Use lowercase, hyphen-separated naming: <code style="color:var(--red);">my-ai-app/</code> in the root directory</p></div></div>
+    <div class="step"><div class="step-num">3</div><div><h3>Add required files</h3><p><code style="color:var(--red);">README.md</code> with setup instructions · <code style="color:var(--red);">deploy.yaml</code> SDL file · (optional) <code style="color:var(--red);">config.json</code> for logo</p></div></div>
+    <div class="step"><div class="step-num">4</div><div><h3>Submit a Pull Request</h3><p>Follow <a href="https://github.com/akash-network/awesome-akash/blob/master/CONTRIBUTING.md" target="_blank" style="color:var(--red);">CONTRIBUTING.md</a> guidelines and tag it correctly</p></div></div>
+  </div>
+  <div style="margin-top:12px;background:rgba(232,62,62,.08);border:1px solid rgba(232,62,62,.2);border-radius:8px;padding:12px 16px;"><strong>💡 Ideas for Student Ambassadors:</strong><span style="color:#ccc;"> Deploy a Jupyter Notebook, a study tool, an open-source LLM chatbot, or any Docker app you use!</span></div>
+</div>
+<div class="slide" id="s7">
+  <div class="tag">Part 3 · Issue Tracking</div>
+  <h2>🛠️ The Support Repo</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:20px;">One central place for bugs, feature requests, and issues across ALL Akash repos — not just one project.</p>
+  <div class="grid grid-2">
+    <div class="card"><div class="card-icon">🔍</div><h3>Before You Open an Issue</h3><ul style="padding-left:16px;margin-top:8px;"><li>Search existing issues first</li><li>Ask in Discord to confirm it's a bug</li><li>Identify which repo the bug belongs to</li></ul></div>
+    <div class="card"><div class="card-icon">🏷️</div><h3>Key Labels to Know</h3><ul style="padding-left:16px;margin-top:8px;"><li><code style="color:var(--red);">repo/console</code> <code style="color:var(--red);">repo/node</code> <code style="color:var(--red);">repo/provider</code></li><li><code style="color:var(--red);">P0</code>–<code style="color:var(--red);">P3</code> for priority</li><li><code style="color:var(--red);">good first issue</code> for newcomers</li><li><code style="color:var(--red);">support</code> for escalations</li></ul></div>
+    <div class="card"><div class="card-icon">📝</div><h3>How to File a Good Issue</h3><ul style="padding-left:16px;margin-top:8px;"><li>Use the issue template provided</li><li>Include steps to reproduce</li><li>Add screenshots or logs</li><li>Tag the correct repo label</li></ul></div>
+    <div class="card"><div class="card-icon">💪</div><h3>How to Contribute a Fix</h3><ul style="padding-left:16px;margin-top:8px;"><li>Comment "I'd like to work on this"</li><li><strong style="color:var(--red);">Share a spec with your proposed solution</strong> — describe your approach before coding so maintainers can align early</li><li>Fork the related repo</li><li>Open a PR referencing the issue</li><li>Join sig-support meetings on Discord</li></ul></div>
+  </div>
+  <div class="link-row" style="margin-top:16px;"><a class="link-btn" href="https://github.com/akash-network/support/issues" target="_blank">📋 Support Issues</a><a class="link-btn" href="https://github.com/akash-network/console/issues" target="_blank">🖥️ Console Issues</a></div>
+</div>
+<div class="slide" id="s8">
+  <div class="tag">Part 3 · Console Repo</div>
+  <h2>🖥️ Contributing to Akash Console</h2>
+  <div class="divider"></div>
+  <div class="two-col">
+    <div>
+      <h3>What is it?</h3>
+      <p style="margin-bottom:12px;">Akash Console is the main web UI for deploying on Akash. It's a <strong>Next.js monorepo</strong> written in TypeScript.</p>
+      <div class="card" style="margin-bottom:12px;"><h3>Apps inside the monorepo:</h3><ul style="padding-left:16px;margin-top:8px;"><li><strong>console</strong> — main deploy UI</li><li><strong>stats</strong> — network usage dashboard</li><li><strong>api</strong> — backend API</li><li><strong>indexer</strong> — blockchain indexer</li></ul></div>
+      <div class="link-row"><a class="link-btn" href="https://github.com/akash-network/console" target="_blank">📁 Console Repo</a><a class="link-btn" href="https://console.akash.network" target="_blank">🚀 Live Console</a></div>
+    </div>
+    <div>
+      <h3>Ways to Contribute</h3>
+      <p style="margin-top:10px;margin-bottom:14px;">Start by browsing open issues in the Console repo. Once you've picked one, clone the repo and run it locally with <code style="color:var(--red);">npm run console:dev</code> (Docker handles the database). When your fix is ready, open a PR referencing the issue number and request a review from the maintainers.</p>
+      <div class="link-row"><a class="link-btn" href="https://github.com/akash-network/console/issues" target="_blank">🐛 Console Issues</a><a class="link-btn" href="https://github.com/akash-network/console/blob/main/README.md" target="_blank">📖 Setup Guide</a></div>
+    </div>
+  </div>
+</div>
+<div class="slide" id="s8b">
+  <div class="tag">Real Examples · From the Community</div>
+  <h2>What a Good Contribution Looks Like</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:20px;">Here are three real contributions from community members — each one a different type, all merged and live in the Akash ecosystem.</p>
+  <div class="grid grid-3">
+    <div class="card"><div class="card-icon">⭐</div><h3>Awesome Akash Template</h3><p style="margin:10px 0;">A community member added an <strong>Agent Zero AI</strong> deployment template — a complete SDL config with a README so anyone can spin it up on Akash in one click.</p><p style="margin-bottom:14px;color:var(--muted);font-size:.8rem;">PR #776 by ToXMon · akash-network/awesome-akash</p><a class="link-btn" href="https://github.com/akash-network/awesome-akash/pull/776/changes" target="_blank" style="font-size:.75rem;">🔗 View PR</a></div>
+    <div class="card"><div class="card-icon">🎥</div><h3>Community Video</h3><p style="margin:10px 0;">A video walkthrough published by Joe, Akash Community Manager — educational content that helps onboard new users and builds visibility for the network.</p><p style="margin-bottom:14px;color:var(--muted);font-size:.8rem;">@akashalpha_ · X / Twitter</p><a class="link-btn" href="https://x.com/akashalpha_/status/2026351103437152745" target="_blank" style="font-size:.75rem;">🔗 Watch Video</a></div>
+    <div class="card"><div class="card-icon">📝</div><h3>Documentation PR</h3><p style="margin:10px 0;">A contributor wrote a full guide for <strong>building an Akash Cloud Provider with Helm Charts</strong> — a complex doc that helps node operators get up and running faster.</p><p style="margin-bottom:14px;color:var(--muted);font-size:.8rem;">PR #915 by vertex451 · akash-network/website</p><a class="link-btn" href="https://github.com/akash-network/website/pull/915" target="_blank" style="font-size:.75rem;">🔗 View PR</a></div>
+  </div>
+  <div style="margin-top:18px;background:rgba(232,62,62,.08);border:1px solid rgba(232,62,62,.2);border-radius:8px;padding:12px 16px;"><strong>💡 Notice the pattern:</strong> <span style="color:#ccc;">Each contribution solves a real problem, is well-documented, and makes Akash easier to use for the next person. That's the bar to aim for.</span></div>
+</div>
+<div class="slide" id="s9a">
+  <div class="tag">Community-Built Tools</div>
+  <h2>Built by the Community, for the Community</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:20px;">Before Console and AkashML existed, community members built tools to make deploying on Akash easier. These two are great examples of what ambassadors can create — and both are now part of the core Akash ecosystem.</p>
+  <div class="two-col">
+    <div class="card" style="border-color:rgba(232,62,62,.4);"><div class="card-icon">💬</div><h3>AkashChat</h3><div style="margin:8px 0;"><a href="https://chat.akash.network" target="_blank" style="color:var(--red);font-size:.85rem;">chat.akash.network →</a></div><p style="margin-bottom:12px;">A fully open-source AI chat interface running on the Akash Supercloud. No logins, no passwords — completely free and privacy-focused.</p><ul style="padding-left:16px;"><li>Supports Llama 3.3-70B, DeepSeek R1, Qwen, Mistral &amp; more</li><li>Up to 27 tokens/sec via H100 &amp; A100 GPUs</li><li>OpenAI-compatible Chat API at <a href="https://chatapi.akash.network" target="_blank" style="color:var(--red);">chatapi.akash.network</a></li><li>Open source — deploy your own instance on Akash</li></ul><div style="margin-top:12px;"><a class="link-btn" href="https://github.com/akash-network/akash-chat" target="_blank" style="font-size:.75rem;">📁 GitHub Repo</a></div></div>
+    <div class="card" style="border-color:rgba(232,62,62,.4);"><div class="card-icon">🦀</div><h3>Claw</h3><div style="margin:8px 0;"><a href="https://claw.akash.network" target="_blank" style="color:var(--red);font-size:.85rem;">claw.akash.network →</a></div><p style="margin-bottom:12px;">A community-built AI assistant purpose-built to help users navigate and deploy on the Akash Network marketplace.</p><ul style="padding-left:16px;"><li>Helps users find the right templates &amp; SDL configs</li><li>Guides you through the deployment process</li><li>Built by a community member to solve a real pain point</li><li>A perfect example of a community contribution that grew into an official tool</li></ul><div style="margin-top:12px;"><a class="link-btn" href="https://claw.akash.network" target="_blank" style="font-size:.75rem;">🚀 Try Claw</a></div></div>
+  </div>
+  <div style="margin-top:16px;background:rgba(232,62,62,.08);border:1px solid rgba(232,62,62,.2);border-radius:8px;padding:12px 16px;"><strong>💡 The takeaway:</strong> <span style="color:#ccc;">These tools started as community contributions. Your next PR or project could become part of the core Akash ecosystem too.</span></div>
+</div>
+<div class="slide" id="s9">
+  <div style="text-align:center;">
+    <div style="font-size:4rem;margin-bottom:16px;">🛠️</div>
+    <div class="tag" style="display:block;text-align:center;margin:0 auto 16px;">Last 45 Minutes</div>
+    <h1>Hands-On Time</h1>
+    <p class="hero-sub" style="margin:16px auto;max-width:520px;text-align:center;">We're going to deploy a live AI model together using <strong style="color:var(--red);">Akash Console</strong> and <strong style="color:var(--red);">AkashML</strong>. This is the same infrastructure powering real AI startups — and you get $100 in free credits.</p>
+    <div class="pills" style="justify-content:center;margin-top:20px;"><span class="pill">Llama 3.3-70B</span><span class="pill">DeepSeek V3</span><span class="pill">Qwen3-30B</span><span class="pill">OpenAI-Compatible API</span><span class="pill">80+ Global Datacenters</span></div>
+    <div class="link-row" style="justify-content:center;margin-top:28px;"><a class="link-btn" href="https://console.akash.network" target="_blank">🚀 Akash Console</a><a class="link-btn" href="https://akashml.com" target="_blank">🤖 AkashML</a></div>
+  </div>
+</div>
+<div class="slide" id="s10">
+  <div class="tag">Hands-On · Part A</div>
+  <h2>🚀 Deploy on Akash Console</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:16px;">Deploy any Docker container — including AI models — in minutes at up to 85% less than AWS.</p>
+  <div class="deploy-step"><div class="deploy-num">1</div><div><h3>Create an account</h3><p>Go to <a href="https://console.akash.network" target="_blank" style="color:var(--red);">console.akash.network</a> — sign up with email or wallet. New accounts get trial credits.</p></div></div>
+  <div class="deploy-step"><div class="deploy-num">2</div><div><h3>Browse Templates</h3><p>Click <strong>"Deploy"</strong> → explore one-click templates. Look for AI/ML templates like <strong>Ollama</strong>, <strong>Open WebUI</strong>, or <strong>Jupyter Notebook</strong>.</p></div></div>
+  <div class="deploy-step"><div class="deploy-num">3</div><div><h3>Configure &amp; Deploy</h3><p>Set CPU/RAM/GPU requirements in the SDL. Click Deploy → receive bids from providers → accept the best price.</p></div></div>
+  <div class="deploy-step"><div class="deploy-num">4</div><div><h3>Access your deployment</h3><p>Get a live URL within seconds. Interact with your AI model directly in the browser. Close when done to stop charges.</p></div></div>
+  <div style="margin-top:12px;background:rgba(232,62,62,.08);border:1px solid rgba(232,62,62,.2);border-radius:8px;padding:12px;"><strong>🎯 Goal:</strong> <span style="color:#ccc;">Deploy the Open WebUI template and interact with a running LLM on decentralized infrastructure.</span></div>
+</div>
+<div class="slide" id="s11">
+  <div class="tag">Hands-On · Part B</div>
+  <h2>🤖 AkashML — Managed AI Inference</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:16px;">AkashML removes all infrastructure complexity. Just sign up and call an API — like OpenAI, but decentralized and cheaper.</p>
+  <div class="deploy-step"><div class="deploy-num">1</div><div><h3>Sign up at akashml.com</h3><p><a href="https://akashml.com" target="_blank" style="color:var(--red);">akashml.com</a> — create an account in under 2 minutes. You get <strong style="color:var(--red);">$100 in free AI credits</strong> instantly.</p></div></div>
+  <div class="deploy-step"><div class="deploy-num">2</div><div><h3>Try the Playground</h3><p>Open the Playground and select a model: <strong>Llama 3.3-70B</strong>, <strong>DeepSeek V3</strong>, or <strong>Qwen3-30B-A3B</strong>. Chat with it directly in the browser.</p></div></div>
+  <div class="deploy-step"><div class="deploy-num">3</div><div><h3>Get your API Key</h3><p>Generate an API key from your dashboard. One unified endpoint supports all models.</p></div></div>
+  <div class="deploy-step"><div class="deploy-num">4</div><div><h3>Call it like OpenAI</h3><p>Change just one line of code: swap the base URL to AkashML's endpoint. Works with LangChain, Haystack, or any OpenAI SDK.</p></div></div>
+  <div style="background:#111;border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-top:8px;font-family:monospace;font-size:.8rem;color:#ccc;"><span style="color:var(--muted);"># Drop-in replacement for OpenAI</span><br/>base_url = <span style="color:#a8ff78;">"https://api.akashml.com/api/v1"</span><br/>model = <span style="color:#a8ff78;">"Meta-Llama-3.3-70B-Instruct"</span></div>
+</div>
+<div class="slide" id="s12">
+  <div style="text-align:center;">
+    <div style="font-size:4rem;margin-bottom:12px;">🏆</div>
+    <div class="tag" style="display:block;text-align:center;margin:0 auto 12px;">Ambassador Challenge</div>
+    <h1>Your First Contribution</h1>
+    <div class="divider" style="margin:12px auto;"></div>
+    <p style="max-width:540px;margin:0 auto 24px;color:#ccc;">Before the next ambassador session, complete at least one of the following:</p>
+    <div class="grid grid-2" style="max-width:720px;margin:0 auto;text-align:left;">
+      <div class="card"><div class="card-icon">⭐</div><h3>Add a Template</h3><p>Submit an SDL template to Awesome Akash — any app you've deployed</p></div>
+      <div class="card"><div class="card-icon">🐛</div><h3>File an Issue</h3><p>Find a bug or UX problem, report it in the Support repo with full details</p></div>
+      <div class="card"><div class="card-icon">📝</div><h3>Write a Blog Post</h3><p>Document your AkashML or Console experience and submit a PR to the website</p></div>
+      <div class="card"><div class="card-icon">🔧</div><h3>Fix an Issue</h3><p>Pick a <code style="color:var(--red);">good first issue</code> from Console or Website and submit a PR</p></div>
+    </div>
+    <div class="link-row" style="justify-content:center;margin-top:24px;"><a class="link-btn" href="https://github.com/akash-network" target="_blank">🐙 GitHub Org</a><a class="link-btn" href="https://discord.akash.network" target="_blank">💬 Discord</a><a class="link-btn" href="https://akash.network/development/welcome/" target="_blank">🗓️ SIGs &amp; WGs</a></div>
+  </div>
+</div>
+<div class="slide" id="s13">
+  <div class="tag">Quick Reference · All Links</div>
+  <h2>Everything You Need</h2>
+  <div class="divider"></div>
+  <div class="grid grid-3">
+    <div class="card"><h3>🌐 Website</h3><a href="https://akash.network" target="_blank">akash.network</a></div>
+    <div class="card"><h3>🚀 Console</h3><a href="https://console.akash.network" target="_blank">console.akash.network</a></div>
+    <div class="card"><h3>🤖 AkashML</h3><a href="https://akashml.com" target="_blank">akashml.com</a></div>
+    <div class="card"><h3>🐙 GitHub Org</h3><a href="https://github.com/akash-network" target="_blank">github.com/akash-network</a></div>
+    <div class="card"><h3>🌐 Website Repo</h3><a href="https://github.com/akash-network/website" target="_blank">akash-network/website</a></div>
+    <div class="card"><h3>🖥️ Console Repo</h3><a href="https://github.com/akash-network/console" target="_blank">akash-network/console</a></div>
+    <div class="card"><h3>⭐ Awesome Akash</h3><a href="https://github.com/akash-network/awesome-akash" target="_blank">akash-network/awesome-akash</a></div>
+    <div class="card"><h3>🛠️ Support Repo</h3><a href="https://github.com/akash-network/support" target="_blank">akash-network/support</a></div>
+    <div class="card"><h3>💬 Discussions</h3><a href="https://github.com/orgs/akash-network/discussions" target="_blank">orgs/akash-network/discussions</a></div>
+    <div class="card"><h3>📋 Project Board</h3><a href="https://github.com/orgs/akash-network/projects" target="_blank">orgs/akash-network/projects</a></div>
+    <div class="card"><h3>🗓️ SIGs &amp; WGs</h3><a href="https://akash.network/development/welcome/" target="_blank">akash.network/development</a></div>
+    <div class="card"><h3>💬 Discord</h3><a href="https://discord.akash.network" target="_blank">discord.akash.network</a></div>
+  </div>
+</div>
+</div>
+<div class="nav">
+  <button onclick="go(0)">01</button>
+  <button onclick="go(1)">02</button>
+  <button onclick="go(2)">03</button>
+  <button onclick="go(3)">04</button>
+  <button onclick="go(4)">05</button>
+  <button onclick="go(5)">06</button>
+  <button onclick="go(6)">07</button>
+  <button onclick="go(7)">08</button>
+  <button onclick="go(8)">09</button>
+  <button onclick="go(9)">10</button>
+  <button onclick="go(10)">11</button>
+  <button onclick="go(11)">12</button>
+  <button onclick="go(12)">13</button>
+  <button onclick="go(13)">14</button>
+  <button onclick="go(14)">15</button>
+  <span class="slide-counter" id="counter">1 / 15</span>
+  <button onclick="prev()" style="font-size:16px;">&#8249;</button>
+  <button onclick="next()" style="font-size:16px;">&#8250;</button>
+</div>
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  function go(n){
+    slides[cur].classList.remove('active');
+    cur = n;
+    slides[cur].classList.add('active');
+    document.getElementById('counter').textContent = (cur+1)+' / '+slides.length;
+    document.querySelectorAll('.nav button').forEach((b,i)=>{
+      if(i===cur) b.classList.add('active'); else b.classList.remove('active');
+    });
+  }
+  function next(){if(cur<slides.length-1)go(cur+1);}
+  function prev(){if(cur>0)go(cur-1);}
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')next();if(e.key==='ArrowLeft')prev();});
+  go(0);
+</script>
 </body>
 </html>
