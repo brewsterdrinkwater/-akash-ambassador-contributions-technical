@@ -1,0 +1,82 @@
+---
+# ================================================================
+#  Akash Source Search Tool — SDL Template
+#  Powered by AkashML · DeepSeek V3
+# ================================================================
+#
+#  HOW TO DEPLOY
+#  ─────────────
+#  1. Replace YOUR_AKASHML_API_KEY_HERE with your AkashML key
+#     → Get one free at https://akashml.com  ($100 in credits)
+#
+#  2. Open https://console.akash.network
+#     → Click "Deploy" → "Build your template" → paste this file
+#
+#  3. Accept a provider bid and your tool will be live in ~60 sec
+#
+#  Students visit the deployment URL and search for sources
+#  using your shared AkashML key — no additional setup needed.
+#
+# ================================================================
+
+version: "2.0"
+
+services:
+  web:
+    image: nginx:alpine
+    env:
+      # ⬇️  PASTE YOUR AKASHML API KEY BELOW (replace the placeholder)
+      - AKASHML_API_KEY=YOUR_AKASHML_API_KEY_HERE
+
+      # The URL below points to the source-search HTML file in this repo.
+      # Update the branch name if you are working from a fork or feature branch.
+      - HTML_URL=https://raw.githubusercontent.com/brewsterdrinkwater/-akash-ambassador-contributions-technical/main/source-search/index.html
+
+    command:
+      - sh
+      - -c
+      - |
+        apk add --no-cache curl &&
+        mkdir -p /usr/share/nginx/html &&
+        echo "Downloading app..." &&
+        curl -fsSL "$HTML_URL" -o /tmp/index.html &&
+        echo "Injecting API key..." &&
+        sed "s|__AKASHML_API_KEY__|${AKASHML_API_KEY}|g" /tmp/index.html \
+          > /usr/share/nginx/html/index.html &&
+        echo "Starting server..." &&
+        nginx -g 'daemon off;'
+
+    expose:
+      - port: 80
+        as: 80
+        to:
+          - global: true
+
+profiles:
+  compute:
+    web:
+      resources:
+        cpu:
+          units: 0.5
+        memory:
+          size: 256Mi
+        storage:
+          size: 512Mi
+
+  placement:
+    dcloud:
+      attributes:
+        host: akash
+      signedBy:
+        anyOf:
+          - akash1365yvmc4s7awdyj3n2sav7xfx76adc6dnmlx63
+      pricing:
+        web:
+          denom: uakt
+          amount: 1000
+
+deployment:
+  web:
+    dcloud:
+      profile: web
+      count: 1
