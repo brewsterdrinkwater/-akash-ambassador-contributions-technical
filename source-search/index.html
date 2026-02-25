@@ -427,7 +427,7 @@ function cardHTML(src, cls) {
   const label    = cls === 'p' ? 'Primary' : 'Secondary';
   const year     = src.year    ? String(src.year) : 'n.d.';
   const pub      = src.publisher ? ` · ${esc(src.publisher)}` : '';
-  const linkHTML = buildLink(src.identifier);
+  const linkHTML = buildLink(src);
   return `
     <div class="card ${cls}">
       <div><span class="card-badge ${cls}">${label}</span></div>
@@ -440,12 +440,14 @@ function cardHTML(src, cls) {
     </div>`;
 }
 
-function buildLink(id) {
-  if (!id || !id.trim()) return '';
-  const clean = id.trim();
-  const href  = clean.startsWith('http') ? clean : `https://doi.org/${clean}`;
-  const label = clean.length > 55 ? clean.slice(0, 52) + '…' : clean;
-  return `<div class="card-link"><a href="${esc(href)}" target="_blank" rel="noopener noreferrer">🔗 ${esc(label)}</a></div>`;
+function buildLink(src) {
+  const id    = (src.identifier || '').trim();
+  const query = encodeURIComponent(((src.title || '') + ' ' + (src.authors || '')).trim());
+  const scholarURL = `https://scholar.google.com/scholar?q=${query}`;
+  const idBadge = id
+    ? `<span style="color:var(--muted);font-size:.73rem;margin-left:8px;">${esc(id)}</span>`
+    : '';
+  return `<div class="card-link"><a href="${scholarURL}" target="_blank" rel="noopener noreferrer">🔍 Verify on Google Scholar</a>${idBadge}</div>`;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
