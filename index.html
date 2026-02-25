@@ -1,44 +1,13 @@
----
-version: "2.0"
-
-services:
-  web:
-    image: nginx:alpine
-    env:
-      - HTML_URL=https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO/main/index.html
-    command:
-      - sh
-      - -c
-      - |
-        apk add --no-cache curl &&
-        mkdir -p /usr/share/nginx/html &&
-        curl -fsSL "$HTML_URL" -o /usr/share/nginx/html/index.html &&
-        nginx -g 'daemon off;'
-    expose:
-      - port: 80
-        as: 80
-        to:
-          - global: true
-
-profiles:
-  compute:
-    web:
-      resources:
-        cpu:
-          units: 0.5
-        memory:
-          size: 256Mi
-        storage:
-          size: 512Mi
-  placement:
-    dcloud:
-      pricing:
-        web:
-          denom: uakt
-          amount: 1000
-
-deployment:
-  web:
-    dcloud:
-      profile: web
-      count: 1
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Akash Student Ambassador - Technical Contributions</title>
+</head>
+<body>
+  <!-- Replace this file with the contents of studentambassadorstechnicalcontributions.html -->
+  <h1>Akash Student Ambassador Technical Contributions</h1>
+  <p>This is a placeholder. Replace this file with your actual HTML content.</p>
+</body>
+</html>
