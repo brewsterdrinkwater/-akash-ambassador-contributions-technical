@@ -4,6 +4,16 @@ version: "2.0"
 services:
   web:
     image: nginx:alpine
+    env:
+      - HTML_URL=https://raw.githubusercontent.com/brewsterdrinkwater/-akash-ambassador-contributions-technical/claude/akash-html-container-WDjDn/index.html
+    command:
+      - sh
+      - -c
+      - |
+        apk add --no-cache curl &&
+        mkdir -p /usr/share/nginx/html &&
+        curl -fsSL "$HTML_URL" -o /usr/share/nginx/html/index.html &&
+        nginx -g 'daemon off;'
     expose:
       - port: 80
         as: 80
